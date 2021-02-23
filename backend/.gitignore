@@ -4,4 +4,4 @@
 /.gitignore
 yarn-error.log
 yarn.lock
-/.env
+.env
