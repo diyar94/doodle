@@ -1,0 +1,147 @@
+@import "~antd/dist/antd.less";
+@import (css) url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono:400,400i|IBM+Plex+Sans:300,400&display=swap');
+
+//theme
+@primary-color: #884EA0;
+@link-color: #333;
+
+@font-family: 'Work Sans', sans-serif;
+@font-weight-normal: 300;
+@font-weight-bold: 500;
+
+//spacing
+@margin-size: 1ch;
+
+//shadows
+@shadow-light-inset: inset 0px 0px 5px -3px rgba(0, 0, 0, 0.55);
+@shadow-light: 0px 0px 5px -3px rgba(0, 0, 0, 0.55);
+
+#root {
+  height: 100vh;
+
+  display: flex;
+}
+
+.doodle-app {
+  flex: 1;
+
+  display: flex;
+
+  > div {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    .ant-slider-track {
+      background-color: transparent !important;
+    }
+
+
+    > div:nth-of-type(1) {
+      flex: 1;
+      display: flex;
+
+      .canvas-holder {
+        //height: 100%;
+        flex: 1;
+      }
+    }
+  }
+
+
+}
+
+/**
+CSS utils
+ */
+
+h1, h2, h3 {
+  font-weight: @font-weight-normal;
+  color: @primary-color;
+}
+
+h3 {
+  text-transform: uppercase;
+}
+
+//margins
+.m0 {
+  margin: 0;
+}
+
+.ml {
+  margin-left: @margin-size;
+}
+
+.mr {
+  margin-right: @margin-size;
+}
+
+.mt {
+  margin-top: @margin-size;
+}
+
+.mb {
+  margin-bottom: @margin-size;
+}
+
+//padding
+.p0 {
+  padding: 0;
+}
+
+.p1 {
+  padding: @margin-size;
+}
+
+.pl {
+  padding-left: @margin-size;
+}
+
+.pr {
+  padding-right: @margin-size;
+}
+
+.pt {
+  padding-top: @margin-size;
+}
+
+.pb {
+  padding-bottom: @margin-size;
+}
+
+.shadow {
+  box-shadow: @shadow-light;
+}
+
+.debug {
+  background-color: rgba(213, 245, 227, 0.4);
+}
+
+//layout
+.h-box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.box-align-center {
+  justify-content: center;
+}
+
+.color-pickers {
+  padding: @margin-size;
+  display: flex;
+  flex-direction: column;
+
+  .color-picker-fg,
+  .color-picker-bg {
+    width: 100%;
+    min-height: 3ch;
+    background-color: crimson;
+    margin-bottom: @margin-size;
+    cursor: pointer;
+  }
+}
