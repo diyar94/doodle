@@ -1,9 +1,20 @@
+import {apiPost, endpoints} from '@/api';
 import ColorPicker from '@/components/ColorPicker';
-import {useSize} from 'ahooks';
+import {useRequest, useSize} from 'ahooks';
 import {Button, Card, Col, Divider, Row, Slider} from 'antd';
+import {notification} from 'antd/es';
+import canvasToImage from 'canvas-to-image';
 import React, {useEffect, useRef, useState} from 'react';
 import {Canvas, Circle} from 'react-g-canvas';
 
+const download_img = a =>
+{
+    canvasToImage(a, {
+        name: 'myPNG',
+        type: 'png',
+        quality: 1
+    });
+};
 
 export default props =>
 {
@@ -12,14 +23,23 @@ export default props =>
 
     const [valueX, setValueX] = useState(50);
     const [valueY, setValueY] = useState(50);
-    const [showColorPicker, setShowColorPicker] = useState(false);
+    const [showColorPicker, setShowColorPicker] = useState(true);
 
     const [fgColor, setFgColor] = useState('black');
     const [bgColor, setBgColor] = useState();
     const [w, setW] = useState(resize.width);
     const [h, setH] = useState();
 
+    const {data: apiResult, loading: apiLoading, error: apiError, run: apiRun} = useRequest(payload =>
+            apiPost(`${endpoints.upload}`, {data: payload}),
+        {
+            manual: true
+        });
+
     const [mode, setMode] = useState('background');
+
+    const [saveLocal, setSaveLocal] = useState(false);
+    const [saveToDb, setSaveDb] = useState(false);
 
     const [dots, setDots] = useState([
         {
@@ -28,18 +48,40 @@ export default props =>
         }
     ]);
 
-    console.log(ref?.current);
-    console.log(resize.width);
+
     useEffect(() =>
     {
-        if (Boolean(ref?.current))
+        if (Boolean(ref?.current) && Boolean(saveLocal))
         {
-            setW(1000);
+            setSaveLocal(false);
+            const canvas = ref?.current.children[0].children[0];
 
+            download_img(canvas);
+        }
+    }, [ref?.current, saveLocal]);
 
+    console.log(apiResult);
+
+    useEffect(() =>
+    {
+        const fetchData = async a =>
+        {
+            await apiRun({'base64Str': a});
+        };
+        if (Boolean(saveToDb) && Boolean(ref?.current))
+        {
+            setSaveDb(false);
+            const canvas = ref?.current.children[0].children[0].toDataURL('image/png').split(';base64')[1];
+
+            fetchData(canvas);
+        }
+        if (Boolean(apiResult))
+        {
+            notification.info('Saved');
         }
 
-    }, [ref?.current]);
+    }, [saveToDb, ref?.current, apiResult]);
+
 
     useEffect(() =>
     {
@@ -53,43 +95,9 @@ export default props =>
 
     }, [valueX, valueY]);
 
-    console.log(w);
+
     return <Card className={'doodle-app'}>
-        {/*<Row>*/}
-        {/*    <Col>*/}
-        {/*        <Button type={'primary'}*/}
-        {/*            // className={'color-picker-fg'}*/}
-        {/*                onClick={() =>*/}
-        {/*                {*/}
-        {/*                    setMode('foreground');*/}
-        {/*                    setShowColorPicker(!Boolean(showColorPicker));*/}
-        {/*                }}>Pen </Button>*/}
-        {/*    </Col>*/}
-
-        <Col>
-            <Button type={'primary'}
-                // className={'color-picker-bg'}
-                    onClick={() =>
-                    {
-                        setMode('background');
-                        setShowColorPicker(!Boolean(showColorPicker));
-                    }}
-            >Background
-            </Button>
-        </Col>
-
-        {/*</Col>*/}
-        {/*    <Col>*/}
-        {/*        <Button type={'primary'}*/}
-        {/*                download={'myImage.jpg'}> Save Local</Button>*/}
-        {/*    </Col>*/}
-
-        {/*    <Col>*/}
-        {/*        <Button type={'primary'}>Save to DB</Button>*/}
-        {/*    </Col>*/}
-        {/*</Row>*/}
-
-        <Row>
+        <Row gutter={[8, 8]}>
             <Col>
                 <Slider vertical={true}
                         reverse={true}
@@ -110,9 +118,11 @@ export default props =>
                       id={'card'}
                       forwardref={ref}>
                     <div ref={ref}
+                         id={'canv'}
                          className={'debug'}>
                         try to resize : {resize.width} : {resize.height}
                         <Canvas width={resize.width}
+                                id={'canv'}
                                 height={resize.height}
                                 style={{
                                     backgroundColor: `${bgColor}`
@@ -141,6 +151,47 @@ export default props =>
                                                      }
                                                      }/>
         }
+        <Row align={'middle'}>
+            <Col>
+                <Button type={'primary'}
+                    // className={'color-picker-fg'}
+                        onClick={() =>
+                        {
+                            setMode('foreground');
+                            // setShowColorPicker(!Boolean(showColorPicker));
+                        }}>Pen </Button>
+            </Col>
+            <Col>
+                <Button type={'primary'}
+                    // className={'color-picker-bg'}
+                        onClick={() =>
+                        {
+                            setMode('background');
+                            // setShowColorPicker(!Boolean(showColorPicker));
+                        }}
+                >Background
+                </Button>
+            </Col>
+            <Col>
+                <Button type={'primary'}
+                        onClick={() => setSaveLocal(true)}
+                > Save Local</Button>
+            </Col>
+
+            <Col>
+                <Button type={'primary'}
+                        htmlType={'submit'}
+                        onClick={e =>
+                        {
+                            setSaveDb(true);
+                            console.log(e);
+                        }}>Save
+                    to DB</Button>
+
+
+            </Col>
+        </Row>
 
     </Card>;
+
 };
