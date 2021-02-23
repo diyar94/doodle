@@ -1,6 +1,7 @@
 /.idea/
 /node_modules/
 
-.gitignore
+/.gitignore
 yarn-error.log
 yarn.lock
+/.env
