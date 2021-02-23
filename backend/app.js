@@ -2,7 +2,8 @@ const express = require('express');
 const router = require('./routes/router');
 const path = require('path');
 const mongoose = require('mongoose');
-const uri = 'mongodb+srv://diyar:Osmanali1994@mycluster.5bkea.mongodb.net/doodle?retryWrites=true&w=majority';
+require('dotenv').config();
+
 
 
 const app = express();
@@ -10,10 +11,10 @@ const app = express();
 
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
-mongoose.connect(uri, {
+mongoose.connect(process.env.DB_URI, {
     dbName: 'doodle',
-    user: 'diyar',
-    pass: 'Osmanali1994',
+    user: process.env.DB_USER,
+    pass: process.env.DB_PASS,
     useFindAndModify: false,
     useCreateIndex: true,
     useUnifiedTopology: true,
